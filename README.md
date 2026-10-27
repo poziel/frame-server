@@ -14,18 +14,17 @@ implementations can sit alongside them without creating language parent folders.
 
 ## Use a package
 
-After the `v0.1.0` tag is available:
+Both crates are available publicly on crates.io:
 
 ```toml
 [dependencies]
-frame-terminal = { git = "https://github.com/poziel/frame-server.git", tag = "v0.1.0" }
-frame-agent-connectors = { git = "https://github.com/poziel/frame-server.git", tag = "v0.1.0" }
+frame-terminal = "0.1.0"
+frame-agent-connectors = "0.1.0"
 ```
 
-Choose only the packages you need. Cargo locates their manifests within this
-repository. During local development use `path = "../frame-server/packages/agents-rust"`
-relative to your application's Cargo manifest instead. Crates.io publication
-is separate; registry availability is not implied by a GitHub release. The
+Choose only the packages you need. Cargo downloads registry packages without
+authentication. During local development use `path = "../frame-server/packages/agents-rust"`
+relative to your application's Cargo manifest instead. Pinned Git dependencies remain an alternative to registry releases. The
 [release guide](docs/releases.md#cratesio-automation) documents initial registry
 setup and trusted publishing for stable tags and development builds on main.
 

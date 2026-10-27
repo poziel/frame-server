@@ -22,14 +22,17 @@ to the exact package directory instead. To inspect a downloaded source archive,
 extract it and use that directory as a Cargo path dependency; `.crate` downloads
 are source packages, not native binaries or a Cargo registry.
 
-Publishing to crates.io is a separate explicit operation. Confirm crate-name
-availability, package contents, metadata, license notices, and `cargo publish
---dry-run` first. Authenticate your crates.io account and publish each package
-with `cargo publish -p PACKAGE`. Crates.io publication is permanent and package
-versions cannot be overwritten. This project does not assume a publishing token
-or claim registry availability before publication is verified.
+Both crates were initially published at `0.1.0` through a verified local Cargo
+upload. Confirm package contents, metadata, license notices, and
+`cargo publish --dry-run` before each new release. Registry versions cannot be
+overwritten; subsequent stable releases must increment the package version.
 
 ## crates.io automation
+
+Trusted publishers are configured for both crates and
+`CRATES_IO_PUBLISH_ENABLED=true` is enabled in the repository. The bootstrap
+token used for the initial upload was revoked. No monthly token renewal or
+stored Cargo publishing secret is required.
 
 The publish job in `.github/workflows/rust.yml` uses crates.io trusted
 publishing through `rust-lang/crates-io-auth-action`. No persistent publishing
