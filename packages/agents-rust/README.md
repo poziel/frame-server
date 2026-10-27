@@ -1,19 +1,103 @@
-# Frame agent connectors
+<p align="center">
+  <img src="https://raw.githubusercontent.com/poziel/frame/main/assets/frame.svg" alt="Frame logo" width="72" height="72">
+</p>
 
-Embed Codex, Claude Agent SDK, Gemini CLI, GitHub Copilot SDK, or OpenCode connectors in a Rust host, or run the optional JSONL executable. Frame applications supply a transport to the [chat module](https://github.com/poziel/frame/tree/main/packages/core/src/modules/chat); this crate owns provider connections and translates their events.
+<h1 align="center">frame-agent-connectors</h1>
 
-The library works independently of any UI framework. Applications embedding it do not need to launch the server executable. Hosts using the executable must distribute its binary, Claude helper, and Python environment explicitly.
+<p align="center">Connect local AI agent tools to your Rust application.</p>
 
-## Build and configure
+<p align="center">
+  <a href="https://crates.io/crates/frame-agent-connectors"><img src="https://img.shields.io/crates/v/frame-agent-connectors?style=flat" alt="Version on crates.io"></a>
+  <a href="https://docs.rs/frame-agent-connectors"><img src="https://img.shields.io/docsrs/frame-agent-connectors?style=flat" alt="API documentation"></a>
+  <a href="https://github.com/poziel/frame-server/blob/main/LICENSE"><img src="https://img.shields.io/github/license/poziel/frame-server?style=flat" alt="MIT license"></a>
+</p>
 
-From the repository root, with Rust/Cargo installed:
+Embed Codex, Claude Agent SDK, Gemini CLI, GitHub Copilot SDK, and OpenCode
+connectors through a shared Rust runtime, or run the optional
+`frame-agent-server` JSONL executable. Provider connections and events are
+independent of any UI framework.
 
-```powershell
-cargo build -p frame-agent-connectors
-target/debug/frame-agent-server.exe --help
+Your application supplies credentials, provider tools, authorization, and
+process lifecycle. Frame applications can connect this runtime to their
+[chat module](https://github.com/poziel/frame/tree/main/packages/core/src/modules/chat)
+through a host-owned transport.
+
+## Install
+
+Add the public crates.io package to your Rust application:
+
+```toml
+[dependencies]
+frame-agent-connectors = "0.1.1"
 ```
 
-On other platforms, omit `.exe`. Provider executables and authentication belong to the host. Creating a connector or starting `frame-agent-server` does not start a provider. Explicit session creation, provider-wide history requests, and subsequent operations can start or contact the selected provider.
+No registry account or download token is required. Provider authentication is
+configured separately by your application.
+
+## Embed the runtime
+
+For the following example, also add Tokio:
+
+```toml
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+```
+
+```rust
+use frame_agent_connectors::runtime::{AgentRuntime, RuntimeConfig};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let runtime = AgentRuntime::new(RuntimeConfig::default()).await?;
+    println!("{}", runtime.capabilities());
+    runtime.dispose().await?;
+    Ok(())
+}
+```
+
+This prints connector capabilities without starting a provider or authenticating.
+Creating a connector or starting the host executable does not start a provider.
+Explicit session creation, provider-wide history requests, and subsequent
+operations can start or contact the selected provider.
+
+## Run the optional host executable
+
+To install the executable from crates.io with Rust/Cargo:
+
+```sh
+cargo install frame-agent-connectors --version 0.1.1 --locked
+frame-agent-server --help
+```
+
+Applications embedding the library do not need the executable. Hosts using it
+must distribute the compiled binary, any selected provider executables, and
+Claude's helper and Python environment explicitly.
+
+To run from a repository checkout instead:
+
+```sh
+cargo run -p frame-agent-connectors --bin frame-agent-server -- --help
+```
+
+## Download a source archive
+
+The [v0.1.1 GitHub Release](https://github.com/poziel/frame-server/releases/tag/v0.1.1)
+also provides [frame-agent-connectors-0.1.1.crate](https://github.com/poziel/frame-server/releases/download/v0.1.1/frame-agent-connectors-0.1.1.crate).
+Download it into your application's directory and extract it:
+
+```sh
+tar -xf frame-agent-connectors-0.1.1.crate
+```
+
+```toml
+[dependencies]
+frame-agent-connectors = { path = "frame-agent-connectors-0.1.1" }
+```
+
+This is a source package, not a prebuilt executable. Cargo resolves third-party
+dependencies when building. It also contains the Claude Python helper and its
+requirements file.
+
+## Configure providers
 
 | Provider   | Required host setup                                                                            | Transport                                                  | Resume / provider-wide history                                                 |
 | ---------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -30,7 +114,7 @@ python -m venv packages/agents-rust/.venv
 packages/agents-rust/.venv/Scripts/python.exe -m pip install -r packages/agents-rust/python/requirements.txt
 ```
 
-The requirement is pinned in [python/requirements.txt](python/requirements.txt). On Unix, use `.venv/bin/python`. Set `connectors.claude.python` to that interpreter. Distribute [frame_claude_agent.py](python/frame_claude_agent.py) alongside your application and set `helper` to its absolute path; the default helper path points into this source checkout at build time.
+The requirement is pinned in [python/requirements.txt](https://github.com/poziel/frame-server/blob/main/packages/agents-rust/python/requirements.txt). On Unix, use `.venv/bin/python`. Set `connectors.claude.python` to that interpreter. Distribute [frame_claude_agent.py](https://github.com/poziel/frame-server/blob/main/packages/agents-rust/python/frame_claude_agent.py) alongside your application and set `helper` to its absolute path; the default helper path points into this source checkout at build time.
 
 Create a host-owned configuration file and pass `--config PATH`:
 
@@ -136,3 +220,9 @@ sandbox around an untrusted provider executable. Model inference/authentication
 still contact the provider. Gemini ACP rejects app-only sessions before starting
 its CLI because this connector has no verified built-in tool ceiling. Ordinary
 Frame Server hosts retain the existing behavior unless they opt into this policy.
+
+[API documentation](https://docs.rs/frame-agent-connectors) ·
+[Frame Server](https://github.com/poziel/frame-server) ·
+[Contributing](https://github.com/poziel/frame-server/blob/main/CONTRIBUTING.md) ·
+[Security](https://github.com/poziel/frame-server/blob/main/SECURITY.md) ·
+[MIT license](https://github.com/poziel/frame-server/blob/main/LICENSE)
