@@ -1,0 +1,17 @@
+[package]
+name = "frame-terminal"
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+edition = "2021"
+description = "Host-independent PTY terminal engine for Frame applications"
+readme = "README.md"
+include = ["src/**", "tests/**", "examples/**", "README.md", "LICENSE"]
+
+[dependencies]
+portable-pty = "0.9"
+serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Threading"] }
