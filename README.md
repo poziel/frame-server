@@ -25,7 +25,9 @@ frame-agent-connectors = { git = "https://github.com/poziel/frame-server.git", t
 Choose only the packages you need. Cargo locates their manifests within this
 repository. During local development use `path = "../frame-server/packages/agents-rust"`
 relative to your application's Cargo manifest instead. Crates.io publication
-is separate; registry availability is not implied by a GitHub release.
+is separate; registry availability is not implied by a GitHub release. The
+[release guide](docs/releases.md#cratesio-automation) documents initial registry
+setup and trusted publishing for stable tags and development builds on main.
 
 ## Build and verify
 
