@@ -61,8 +61,7 @@ as xterm normally does this. Windows sessions retain ConPTY startup and
 process-handle termination behavior.
 
 Shells inherit the host's privileges and environment. Your application owns
-process authorization and OS isolation. Frame's Tauri bridge, Electron IPC,
-and other host transports live outside this crate.
+process authorization and OS isolation. The optional Tauri bridge lives in this crate; other host transports are not supplied.
 
 ## Download a source archive
 
@@ -96,3 +95,17 @@ cargo test -p frame-terminal --locked
 [Contributing](https://github.com/poziel/frame-server/blob/main/CONTRIBUTING.md) ·
 [Security](https://github.com/poziel/frame-server/blob/main/SECURITY.md) ·
 [MIT license](https://github.com/poziel/frame-server/blob/main/LICENSE)
+
+## Optional embedded Tauri adapter
+
+Enable the `tauri` feature on this crate and register
+`.plugin(frame_terminal::tauri::init())` on the application's Tauri builder.
+Grant `frame-terminal:default` only to trusted local webviews. The connector
+derives session ownership from Tauri and closes sessions on window destruction
+or application exit. It starts no shell until an explicit spawn request.
+
+The frontend uses `createTauriTerminalBackend()` from `@frame/tauri/terminal`.
+No Rust source is shipped through that npm package. Other Rust applications
+continue to use `Terminals` directly without enabling the optional feature.
+Until these changes are released, use the local Frame Server checkout as a
+Cargo path dependency with `features = ["tauri"]`.

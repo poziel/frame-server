@@ -6,32 +6,28 @@ and `agents-rust` initially. Creating a backend starts no external work.
 
 Rust applications embed libraries directly. The agent crate additionally offers
 an explicit JSONL executable. A terminal server protocol is not implemented.
-Host-specific bridges belong to Frame's host integration packages, including
-the Rust and TypeScript halves of a Tauri bridge. Core has no dependency on
-Frame Server. Other hosts can embed the same engine through their own bridge.
-
+Optional Tauri integrations live inside each Rust feature crate under the
+`tauri` Cargo feature. The engines remain host-independent by default.
+Frame's npm Tauri package supplies matching TypeScript adapters, with no Rust
+source. Applications explicitly register native plugins and retain credentials,
+authorization and application-specific request policy. The agent transport
+delegates these decisions through `AgentHost`; it does not bypass them.
+Core has no dependency on Frame Server. Other hosts can embed the same engines
+through their own integration; no additional host is implemented here.
 The terminal API accepts a trusted host-assigned owner identifier; a renderer
 must never choose this identity. Hosts authenticate requests, restrict content
 access, close sessions on host disposal, and supply credentials and policies.
 Terminal output callbacks return an error on disconnect, which terminates the
 associated shell. Dropping the engine terminates its remaining sessions.
 
-Keep existing agent crate names and version 0.1.0. Copy active sources and tests
-from the former companion; exclude archives, caches, and recovery trees. Retain
-the original companion until consumers have migrated and verification passes.
+Keep existing public crate names and host-independent APIs. The optional
+adapters are enabled explicitly in Cargo and registered on the Tauri builder.
+Pixen uses the reusable agent transport while retaining artwork preparation,
+tool restrictions, provider configuration, and application-exit cleanup.
 
-## Implementation plan
-
-1. Preserve the agent crate, Python helper, fixtures, and tests in agents-rust.
-2. Test the terminal's public lifecycle and owner isolation, then extract PTY
-   handling into terminal-rust and retain Windows startup/termination behavior.
-3. Delegate Frame's Tauri plugin to this engine and expose its TypeScript
-   transport through @frame/tauri/terminal. Preserve permissions and cleanup.
-4. Add Cargo workspace, package metadata/licenses, examples, contribution and
-   release documentation, CI, and versioned source package release artifacts.
-5. Update Pixen's local agent dependency; verify Rust tests, package contents,
-   bridge compilation, and TypeScript host builds before committing/pushing.
-
+The frontend and native integration must be released together before consumer
+projects can switch from local development paths to published dependency pins.
+Never publish changed crate contents under an existing immutable version.
 Crates.io publication needs an authenticated account and available crate names.
 GitHub Releases can carry verified .crate archives immediately; consumers can
 use a pinned Git tag without a registry account. GitHub Packages is not Cargo.

@@ -396,3 +396,6 @@ mod tests {
         assert!(String::from_utf8_lossy(&bytes).contains("FRAME_PTY_OK"));
     }
 }
+
+#[cfg(feature = "tauri")]
+pub mod tauri;

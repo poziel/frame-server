@@ -226,3 +226,27 @@ Frame Server hosts retain the existing behavior unless they opt into this policy
 [Contributing](https://github.com/poziel/frame-server/blob/main/CONTRIBUTING.md) ·
 [Security](https://github.com/poziel/frame-server/blob/main/SECURITY.md) ·
 [MIT license](https://github.com/poziel/frame-server/blob/main/LICENSE)
+
+## Optional embedded Tauri adapter
+
+Enable this crate's `tauri` Cargo feature and implement `tauri::AgentHost`.
+Register `.plugin(frame_agent_connectors::tauri::init(MyAgentHost))` and grant
+`frame-agent-connectors:default` only to trusted local webviews.
+
+The plugin routes request/disconnect operations and window-close callbacks.
+Your implementation must check native `AgentContext.webview` ownership,
+authorize operations, and dispose the corresponding runtimes in `disconnect`
+and `close_window`. Await application-wide runtime disposal on application
+exit. Runtime identifiers are not authorization credentials.
+
+Keep setup in an explicit application-owned command: load provider settings,
+choose allowed roots/tools, construct an `Arc<AgentRuntime>`, and wire its
+events through `tauri::event_sink(runtime.clone(), events)`. Receiver failure
+disposes the runtime. Setup creates no provider session; an explicit request
+does that. The host retains any application resources while requests run.
+
+The frontend's `connectTauriAgent` from `@frame/tauri/agents` accepts that
+setup command and supplies reusable requests, event subscriptions, and
+idempotent disposal. Application-specific prompt preparation and tool policy
+remain in the host. The library and JSONL executable remain available without
+enabling Tauri. Use local Cargo path dependencies until this feature is released.
